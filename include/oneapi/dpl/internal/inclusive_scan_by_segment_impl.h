@@ -55,7 +55,7 @@ inclusive_scan_by_segment_impl(Policy&& policy, InputIterator1 first1, InputIter
     typedef typename ::std::iterator_traits<InputIterator2>::value_type ValueType;
     typedef typename ::std::decay<Policy>::type policy_type;
 
-    oneapi::dpl::__par_backend::__buffer<policy_type, FlagType> _mask(n);
+    oneapi::dpl::__utils::__buffer<policy_type, FlagType> _mask(n);
     auto mask = _mask.get();
 
     mask[0] = 1;

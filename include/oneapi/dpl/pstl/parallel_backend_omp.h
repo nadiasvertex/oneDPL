@@ -52,33 +52,6 @@ __cancel_execution()
 {
 }
 
-//------------------------------------------------------------------------
-// raw buffer
-//------------------------------------------------------------------------
-
-template <typename _ExecutionPolicy, typename _Tp>
-class __buffer
-{
-    std::allocator<_Tp> __allocator_;
-    _Tp* __ptr_;
-    const std::size_t __buf_size_;
-    __buffer(const __buffer&) = delete;
-    void
-    operator=(const __buffer&) = delete;
-
-  public:
-    __buffer(std::size_t __n) : __allocator_(), __ptr_(__allocator_.allocate(__n)), __buf_size_(__n) {}
-
-    operator bool() const { return __ptr_ != nullptr; }
-
-    _Tp*
-    get() const
-    {
-        return __ptr_;
-    }
-    ~__buffer() { __allocator_.deallocate(__ptr_, __buf_size_); }
-};
-
 // Preliminary size of each chunk: requires further discussion
 constexpr std::size_t __default_chunk_size = 512;
 

@@ -260,6 +260,37 @@ __set_symmetric_difference_construct(_ForwardIterator1 __first1, _ForwardIterato
     return __cc_range(__first2, __last2, __result);
 }
 
+//------------------------------------------------------------------------
+// raw buffer
+//------------------------------------------------------------------------
+
+//! Raw memory buffer with automatic freeing and no exceptions.
+/** Some of our algorithms need to start with raw memory buffer,
+not an initialize array, because initialization/destruction
+would make the span be at least O(N). */
+template <typename _ExecutionPolicy, typename _Tp, typename _Allocator = std::allocator<_Tp>>
+class __buffer
+{
+    _Allocator __allocator_;
+    _Tp* __ptr_;
+    const std::size_t __buf_size_;
+    __buffer(const __buffer&) = delete;
+    void
+    operator=(const __buffer&) = delete;
+
+  public:
+    __buffer(std::size_t __n) : __allocator_(), __ptr_(__allocator_.allocate(__n)), __buf_size_(__n) {}
+
+    operator bool() const { return __ptr_ != nullptr; }
+
+    _Tp*
+    get() const
+    {
+        return __ptr_;
+    }
+    ~__buffer() { __allocator_.deallocate(__ptr_, __buf_size_); }
+};
+
 } // namespace __utils
 } // namespace dpl
 } // namespace oneapi

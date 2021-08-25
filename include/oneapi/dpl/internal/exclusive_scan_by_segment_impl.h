@@ -60,7 +60,7 @@ exclusive_scan_by_segment_impl(Policy&& policy, InputIterator1 first1, InputIter
     InputIterator2 last2 = first2 + n;
 
     // compute head flags
-    oneapi::dpl::__par_backend::__buffer<policy_type, FlagType> _flags(n);
+    oneapi::dpl::__utils::__buffer<policy_type, FlagType> _flags(n);
     auto flags = _flags.get();
     flags[0] = 1;
 
@@ -68,7 +68,7 @@ exclusive_scan_by_segment_impl(Policy&& policy, InputIterator1 first1, InputIter
               ::std::not2(binary_pred));
 
     // shift input one to the right and initialize segments with init
-    oneapi::dpl::__par_backend::__buffer<policy_type, OutputType> _temp(n);
+    oneapi::dpl::__utils::__buffer<policy_type, OutputType> _temp(n);
     auto temp = _temp.get();
 
     temp[0] = init;
