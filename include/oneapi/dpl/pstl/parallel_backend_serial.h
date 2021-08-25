@@ -124,12 +124,19 @@ __parallel_merge(_ExecutionPolicy&&, _RandomAccessIterator1 __first1, _RandomAcc
     __leaf_merge(__first1, __last1, __first2, __last2, __outit, __comp);
 }
 
+template <typename _F1, typename _F2>
+void
+__parallel_invoke_body(_F1&& __f1, _F2&& __f2)
+{
+    ::std::forward<_F1>(__f1)();
+    ::std::forward<_F2>(__f2)();
+}
+
 template <class _ExecutionPolicy, typename _F1, typename _F2>
 void
 __parallel_invoke(_ExecutionPolicy&&, _F1&& __f1, _F2&& __f2)
 {
-    ::std::forward<_F1>(__f1)();
-    ::std::forward<_F2>(__f2)();
+    __parallel_invoke_body(::std::forward<_F1>(__f1), ::std::forward<_F2>(__f2));
 }
 
 template <class _ExecutionPolicy, class _ForwardIterator, class _Fp>
