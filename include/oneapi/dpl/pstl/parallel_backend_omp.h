@@ -49,6 +49,7 @@ namespace __par_backend
 inline void
 __cancel_execution()
 {
+    //TODO: To consider usage of #pragma omp cancel
 }
 
 // Preliminary size of each chunk: requires further discussion
