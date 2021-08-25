@@ -2,7 +2,7 @@ namespace oneapi
 {
 namespace dpl
 {
-namespace __omp_backend
+namespace __par_backend
 {
 
 template <class _RandomAccessIterator, class _Value, typename _RealBody, typename _Reduction>
@@ -48,7 +48,7 @@ __parallel_reduce(_ExecutionPolicy&&, _RandomAccessIterator __first, _RandomAcce
     // just create tasks.
     if (omp_in_parallel())
     {
-        return dpl::__omp_backend::__parallel_reduce_body(__first, __last, __identity, __real_body, __reduction);
+        return dpl::__par_backend::__parallel_reduce_body(__first, __last, __identity, __real_body, __reduction);
     }
 
     // In any case (nested or non-nested) one parallel region is created and only
@@ -58,12 +58,12 @@ __parallel_reduce(_ExecutionPolicy&&, _RandomAccessIterator __first, _RandomAcce
     _PSTL_PRAGMA(omp parallel)
     _PSTL_PRAGMA(omp single)
     {
-        __res = dpl::__omp_backend::__parallel_reduce_body(__first, __last, __identity, __real_body, __reduction);
+        __res = dpl::__par_backend::__parallel_reduce_body(__first, __last, __identity, __real_body, __reduction);
     }
 
     return __res;
 }
 
-} // namespace __omp_backend
+} // namespace __par_backend
 } // namespace dpl
 } // namespace oneapi

@@ -38,16 +38,6 @@ using namespace oneapi::dpl::__serial_backend;
 } // namespace oneapi
 #elif defined(_ONEDPL_PAR_BACKEND_OMP)
 #    include "parallel_backend_omp.h"
-namespace oneapi
-{
-namespace dpl
-{
-namespace __par_backend
-{
-using namespace oneapi::dpl::__omp_backend;
-}
-} // namespace dpl
-} // namespace oneapi
 #elif defined(_ONEDPL_PAR_BACKEND_TBB)
 #    include "parallel_backend_tbb.h"
 #else

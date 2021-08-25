@@ -2,7 +2,7 @@ namespace oneapi
 {
 namespace dpl
 {
-namespace __omp_backend
+namespace __par_backend
 {
 
 //------------------------------------------------------------------------
@@ -25,7 +25,7 @@ __transform_reduce_body(_RandomAccessIterator __first, _RandomAccessIterator __l
 
     // Initial partition of the iteration space into chunks. If the range is too small,
     // this will result in a nonsense policy, so we check on the size as well below.
-    auto __policy = __omp_backend::__chunk_partitioner(__first + __num_threads, __last);
+    auto __policy = __par_backend::__chunk_partitioner(__first + __num_threads, __last);
 
     if (__size <= __num_threads || __policy.__n_chunks < 2)
     {
@@ -48,7 +48,7 @@ __transform_reduce_body(_RandomAccessIterator __first, _RandomAccessIterator __l
     _PSTL_PRAGMA(omp taskloop shared(__accums))
     for (std::size_t __chunk = 0; __chunk < __policy.__n_chunks; ++__chunk)
     {
-        __omp_backend::__process_chunk(__policy, __first + __num_threads, __chunk,
+        __par_backend::__process_chunk(__policy, __first + __num_threads, __chunk,
                                        [&](auto __chunk_first, auto __chunk_last)
                                        {
                                            auto __thread_num = omp_get_thread_num();
@@ -84,7 +84,7 @@ __parallel_transform_reduce(_ExecutionPolicy&&, _RandomAccessIterator __first, _
         // We don't create a nested parallel region in an existing parallel
         // region: just create tasks
         __result =
-            dpl::__omp_backend::__transform_reduce_body(__first, __last, __unary_op, __init, __combiner, __reduction);
+            dpl::__par_backend::__transform_reduce_body(__first, __last, __unary_op, __init, __combiner, __reduction);
     }
     else
     {
@@ -93,7 +93,7 @@ __parallel_transform_reduce(_ExecutionPolicy&&, _RandomAccessIterator __first, _
         _PSTL_PRAGMA(omp parallel)
         _PSTL_PRAGMA(omp single)
         {
-            __result = dpl::__omp_backend::__transform_reduce_body(__first, __last, __unary_op, __init, __combiner,
+            __result = dpl::__par_backend::__transform_reduce_body(__first, __last, __unary_op, __init, __combiner,
                                                                    __reduction);
         }
     }
@@ -101,6 +101,6 @@ __parallel_transform_reduce(_ExecutionPolicy&&, _RandomAccessIterator __first, _
     return __result;
 }
 
-} // namespace __omp_backend
+} // namespace __par_backend
 } // namespace dpl
 } // namespace oneapi

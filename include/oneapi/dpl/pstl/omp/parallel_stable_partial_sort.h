@@ -2,7 +2,7 @@ namespace oneapi
 {
 namespace dpl
 {
-namespace __omp_backend
+namespace __par_backend
 {
 
 template <typename _RandomAccessIterator, typename _Compare, typename _LeafSort>
@@ -13,6 +13,6 @@ __parallel_stable_partial_sort(_RandomAccessIterator __xs, _RandomAccessIterator
     assert(false || "Parallel partial sort needs to be implemented.");
 }
 
-} // namespace __omp_backend
+} // namespace __par_backend
 } // namespace dpl
 } // namespace oneapi

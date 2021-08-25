@@ -45,7 +45,8 @@ __parallel_find(_ExecutionPolicy&& __exec, _Index __first, _Index __last, _Brick
     ::std::atomic<_DifferenceType> __extremum(__initial_dist);
     // TODO: find out what is better here: parallel_for or parallel_reduce
     __par_backend::__parallel_for(::std::forward<_ExecutionPolicy>(__exec), __first, __last,
-                                  [__comp, __f, __first, &__extremum](_Index __i, _Index __j) {
+                                  [__comp, __f, __first, &__extremum](_Index __i, _Index __j)
+                                  {
                                       // See "Reducing Contention Through Priority Updates", PPoPP '13, for discussion of
                                       // why using a shared variable scales fairly well in this situation.
                                       if (__comp(__i - __first, __extremum))
@@ -76,7 +77,8 @@ __parallel_or(_ExecutionPolicy&& __exec, _Index __first, _Index __last, _Brick _
 {
     ::std::atomic<bool> __found(false);
     __par_backend::__parallel_for(::std::forward<_ExecutionPolicy>(__exec), __first, __last,
-                                  [__f, &__found](_Index __i, _Index __j) {
+                                  [__f, &__found](_Index __i, _Index __j)
+                                  {
                                       if (!__found.load(::std::memory_order_relaxed) && __f(__i, __j))
                                       {
                                           __found.store(true, ::std::memory_order_relaxed);
@@ -84,6 +86,55 @@ __parallel_or(_ExecutionPolicy&& __exec, _Index __first, _Index __last, _Brick _
                                       }
                                   });
     return __found;
+}
+
+template <typename _Index>
+_Index
+__split(_Index __m)
+{
+    _Index __k = 1;
+    while (2 * __k < __m)
+        __k *= 2;
+    return __k;
+}
+
+template <typename _Index, typename _Tp, typename _Rp, typename _Cp>
+void
+__upsweep(_Index __i, _Index __m, _Index __tilesize, _Tp* __r, _Index __lastsize, _Rp __reduce, _Cp __combine)
+{
+    if (__m == 1)
+        __r[0] = __reduce(__i * __tilesize, __lastsize);
+    else
+    {
+        _Index __k = __split(__m);
+        __par_backend::__parallel_invoke_body(
+            [=] { __internal::__upsweep(__i, __k, __tilesize, __r, __tilesize, __reduce, __combine); }, [=]
+            { __internal::__upsweep(__i + __k, __m - __k, __tilesize, __r + __k, __lastsize, __reduce, __combine); });
+        if (__m == 2 * __k)
+            __r[__m - 1] = __combine(__r[__k - 1], __r[__m - 1]);
+    }
+}
+
+template <typename _Index, typename _Tp, typename _Cp, typename _Sp>
+void
+__downsweep(_Index __i, _Index __m, _Index __tilesize, _Tp* __r, _Index __lastsize, _Tp __initial, _Cp __combine,
+            _Sp __scan)
+{
+    if (__m == 1)
+        __scan(__i * __tilesize, __lastsize, __initial);
+    else
+    {
+        const _Index __k = __split(__m);
+        __par_backend::__parallel_invoke_body(
+            [=] { __internal::__downsweep(__i, __k, __tilesize, __r, __tilesize, __initial, __combine, __scan); },
+            // Assumes that __combine never throws.
+            // TODO: Consider adding a requirement for user functors to be constant.
+            [=, &__combine]
+            {
+                __internal::__downsweep(__i + __k, __m - __k, __tilesize, __r + __k, __lastsize,
+                                        __combine(__initial, __r[__k - 1]), __combine, __scan);
+            });
+    }
 }
 
 } // namespace __internal

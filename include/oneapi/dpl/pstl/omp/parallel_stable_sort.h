@@ -2,7 +2,7 @@ namespace oneapi
 {
 namespace dpl
 {
-namespace __omp_backend
+namespace __par_backend
 {
 
 namespace __sort_details
@@ -31,12 +31,12 @@ __parallel_move_range(Iterator1 __first1, Iterator1 __last1, Iterator2 __first2)
     }
 
     // Perform parallel moving of larger chunks
-    auto __policy = __omp_backend::__chunk_partitioner(__first1, __last1);
+    auto __policy = __par_backend::__chunk_partitioner(__first1, __last1);
 
     _PSTL_PRAGMA(omp taskloop)
     for (std::size_t __chunk = 0; __chunk < __policy.__n_chunks; ++__chunk)
     {
-        __omp_backend::__process_chunk(__policy, __first1, __chunk,
+        __par_backend::__process_chunk(__policy, __first1, __chunk,
                                        [&](auto __chunk_first, auto __chunk_last)
                                        {
                                            auto __chunk_offset = ::std::distance(__first1, __chunk_first);
@@ -67,8 +67,8 @@ __parallel_stable_sort_body(_RandomAccessIterator __xs, _RandomAccessIterator __
     using _ValueType = typename std::iterator_traits<_RandomAccessIterator>::value_type;
     using _VecType = typename std::vector<_ValueType>;
     using _OutputIterator = typename _VecType::iterator;
-    using _MoveValueType = typename __omp_backend::__sort_details::__move_value<_RandomAccessIterator, _OutputIterator>;
-    using _MoveRangeType = __omp_backend::__sort_details::__move_range<_RandomAccessIterator, _OutputIterator>;
+    using _MoveValueType = typename __par_backend::__sort_details::__move_value<_RandomAccessIterator, _OutputIterator>;
+    using _MoveRangeType = __par_backend::__sort_details::__move_range<_RandomAccessIterator, _OutputIterator>;
 
     if (__should_run_serial(__xs, __xe))
     {
@@ -144,6 +144,6 @@ __parallel_stable_sort(_ExecutionPolicy&& __exec, _RandomAccessIterator __xs, _R
     }
 }
 
-} // namespace __omp_backend
+} // namespace __par_backend
 } // namespace dpl
 } // namespace oneapi

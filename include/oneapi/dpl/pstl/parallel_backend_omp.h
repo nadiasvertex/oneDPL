@@ -23,7 +23,6 @@
 #include <omp.h>
 
 #include "parallel_backend_utils.h"
-#include "unseq_backend_simd.h"
 #include "utils.h"
 
 #if !defined(_OPENMP)
@@ -41,7 +40,7 @@ namespace oneapi
 {
 namespace dpl
 {
-namespace __omp_backend
+namespace __par_backend
 {
 
 //------------------------------------------------------------------------
@@ -143,7 +142,7 @@ __process_chunk(const __chunk_policy& __policy, _Iterator __base, _Index __chunk
     __f(__first, __last);
 }
 
-} // namespace __omp_backend
+} // namespace __par_backend
 } // namespace dpl
 } // namespace oneapi
 
@@ -176,6 +175,7 @@ __process_chunk(const __chunk_policy& __policy, _Iterator __base, _Index __chunk
 // parallel_scan
 //------------------------------------------------------------------------
 
+#include "parallel_impl.h"
 #include "./omp/parallel_scan.h"
 #include "./omp/parallel_transform_scan.h"
 

@@ -2,7 +2,7 @@ namespace oneapi
 {
 namespace dpl
 {
-namespace __omp_backend
+namespace __par_backend
 {
 
 template <class _ForwardIterator, class _Fp>
@@ -28,17 +28,17 @@ __parallel_for_each(_ExecutionPolicy&&, _ForwardIterator __first, _ForwardIterat
     {
         // we don't create a nested parallel region in an existing parallel
         // region: just create tasks
-        dpl::__omp_backend::__parallel_for_each_body(__first, __last, __f);
+        dpl::__par_backend::__parallel_for_each_body(__first, __last, __f);
     }
     else
     {
         // in any case (nested or non-nested) one parallel region is created and
         // only one thread creates a set of tasks
         _PSTL_PRAGMA(omp parallel)
-        _PSTL_PRAGMA(omp single) { dpl::__omp_backend::__parallel_for_each_body(__first, __last, __f); }
+        _PSTL_PRAGMA(omp single) { dpl::__par_backend::__parallel_for_each_body(__first, __last, __f); }
     }
 }
 
-} // namespace __omp_backend
+} // namespace __par_backend
 } // namespace dpl
 } // namespace oneapi

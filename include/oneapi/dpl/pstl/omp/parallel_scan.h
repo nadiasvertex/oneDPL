@@ -2,59 +2,8 @@ namespace oneapi
 {
 namespace dpl
 {
-namespace __omp_backend
+namespace __par_backend
 {
-
-template <typename _Index>
-_Index
-__split(_Index __m)
-{
-    _Index __k = 1;
-    while (2 * __k < __m)
-        __k *= 2;
-    return __k;
-}
-
-template <typename _Index, typename _Tp, typename _Rp, typename _Cp>
-void
-__upsweep(_Index __i, _Index __m, _Index __tilesize, _Tp* __r, _Index __lastsize, _Rp __reduce, _Cp __combine)
-{
-    if (__m == 1)
-        __r[0] = __reduce(__i * __tilesize, __lastsize);
-    else
-    {
-        _Index __k = __split(__m);
-        __omp_backend::__parallel_invoke_body(
-            [=] { __omp_backend::__upsweep(__i, __k, __tilesize, __r, __tilesize, __reduce, __combine); },
-            [=] {
-                __omp_backend::__upsweep(__i + __k, __m - __k, __tilesize, __r + __k, __lastsize, __reduce, __combine);
-            });
-        if (__m == 2 * __k)
-            __r[__m - 1] = __combine(__r[__k - 1], __r[__m - 1]);
-    }
-}
-
-template <typename _Index, typename _Tp, typename _Cp, typename _Sp>
-void
-__downsweep(_Index __i, _Index __m, _Index __tilesize, _Tp* __r, _Index __lastsize, _Tp __initial, _Cp __combine,
-            _Sp __scan)
-{
-    if (__m == 1)
-        __scan(__i * __tilesize, __lastsize, __initial);
-    else
-    {
-        const _Index __k = __split(__m);
-        __omp_backend::__parallel_invoke_body(
-            [=] { __omp_backend::__downsweep(__i, __k, __tilesize, __r, __tilesize, __initial, __combine, __scan); },
-            // Assumes that __combine never throws.
-            // TODO: Consider adding a requirement for user functors to be constant.
-            [=, &__combine]
-            {
-                __omp_backend::__downsweep(__i + __k, __m - __k, __tilesize, __r + __k, __lastsize,
-                                           __combine(__initial, __r[__k - 1]), __combine, __scan);
-            });
-    }
-}
 
 template <typename _ExecutionPolicy, typename _Index, typename _Tp, typename _Rp, typename _Cp, typename _Sp,
           typename _Ap>
@@ -68,7 +17,7 @@ __parallel_strict_scan_body(_Index __n, _Tp __initial, _Rp __reduce, _Cp __combi
     oneapi::dpl::__utils::__buffer<_ExecutionPolicy, _Tp> __buf(__m + 1);
     _Tp* __r = __buf.get();
 
-    __omp_backend::__upsweep(_Index(0), _Index(__m + 1), __tilesize, __r, __n - __m * __tilesize, __reduce, __combine);
+    __internal::__upsweep(_Index(0), _Index(__m + 1), __tilesize, __r, __n - __m * __tilesize, __reduce, __combine);
 
     std::size_t __k = __m + 1;
     _Tp __t = __r[__k - 1];
@@ -78,8 +27,8 @@ __parallel_strict_scan_body(_Index __n, _Tp __initial, _Rp __reduce, _Cp __combi
     }
 
     __apex(__combine(__initial, __t));
-    __omp_backend::__downsweep(_Index(0), _Index(__m + 1), __tilesize, __r, __n - __m * __tilesize, __initial,
-                               __combine, __scan);
+    __internal::__downsweep(_Index(0), _Index(__m + 1), __tilesize, __r, __n - __m * __tilesize, __initial, __combine,
+                            __scan);
 }
 
 template <class _ExecutionPolicy, typename _Index, typename _Tp, typename _Rp, typename _Cp, typename _Sp, typename _Ap>
@@ -104,7 +53,7 @@ __parallel_strict_scan(_ExecutionPolicy&&, _Index __n, _Tp __initial, _Rp __redu
 
     if (omp_in_parallel())
     {
-        dpl::__omp_backend::__parallel_strict_scan_body<_ExecutionPolicy>(__n, __initial, __reduce, __combine, __scan,
+        dpl::__par_backend::__parallel_strict_scan_body<_ExecutionPolicy>(__n, __initial, __reduce, __combine, __scan,
                                                                           __apex);
     }
     else
@@ -112,12 +61,12 @@ __parallel_strict_scan(_ExecutionPolicy&&, _Index __n, _Tp __initial, _Rp __redu
         _PSTL_PRAGMA(omp parallel)
         _PSTL_PRAGMA(omp single)
         {
-            dpl::__omp_backend::__parallel_strict_scan_body<_ExecutionPolicy>(__n, __initial, __reduce, __combine,
+            dpl::__par_backend::__parallel_strict_scan_body<_ExecutionPolicy>(__n, __initial, __reduce, __combine,
                                                                               __scan, __apex);
         }
     }
 }
 
-} // namespace __omp_backend
+} // namespace __par_backend
 } // namespace dpl
 } // namespace oneapi

@@ -2,7 +2,7 @@ namespace oneapi
 {
 namespace dpl
 {
-namespace __omp_backend
+namespace __par_backend
 {
 
 template <typename _RandomAccessIterator1, typename _RandomAccessIterator2, typename _RandomAccessIterator3,
@@ -13,7 +13,7 @@ __parallel_merge_body(std::size_t __size_x, std::size_t __size_y, _RandomAccessI
                       _RandomAccessIterator3 __zs, _Compare __comp, _LeafMerge __leaf_merge)
 {
 
-    if (__size_x + __size_y <= __omp_backend::__default_chunk_size)
+    if (__size_x + __size_y <= __par_backend::__default_chunk_size)
     {
         __leaf_merge(__xs, __xe, __ys, __ye, __zs, __comp);
         return;
@@ -85,6 +85,6 @@ __parallel_merge(_ExecutionPolicy&& /*__exec*/, _RandomAccessIterator1 __xs, _Ra
     }
 }
 
-} // namespace __omp_backend
+} // namespace __par_backend
 } // namespace dpl
 } // namespace oneapi
