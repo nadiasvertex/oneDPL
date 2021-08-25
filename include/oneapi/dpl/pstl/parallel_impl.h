@@ -88,6 +88,12 @@ __parallel_or(_ExecutionPolicy&& __exec, _Index __first, _Index __last, _Brick _
     return __found;
 }
 
+// TODO: Here are improvements to consider:
+// 1. Affinitize leaves of upsweep and leaves of downsweep.  For working sets that
+//    fit in cache, this might reduce memory interconnect load significantly.
+// 2. Add automatic tilesize adjustment.  Initial stealing during upsweep ought to provide a good hint.
+// 3. Use continuation-passing style for the tasks.  For downsweep, a binomial tree pattern is likely optimal.
+
 template <typename _Index>
 _Index
 __split(_Index __m)

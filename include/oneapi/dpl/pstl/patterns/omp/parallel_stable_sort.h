@@ -120,13 +120,13 @@ __parallel_stable_sort(_ExecutionPolicy&& __exec, _RandomAccessIterator __xs, _R
 
     if (omp_in_parallel())
     {
-            __parallel_stable_sort_body(__xs, __xe, __comp, __leaf_sort);
+        __parallel_stable_sort_body(__xs, __xe, __comp, __leaf_sort);
     }
     else
     {
         _PSTL_PRAGMA(omp parallel)
         _PSTL_PRAGMA(omp single)
-            __parallel_stable_sort_body(__xs, __xe, __comp, __leaf_sort);
+        __parallel_stable_sort_body(__xs, __xe, __comp, __leaf_sort);
     }
 }
 

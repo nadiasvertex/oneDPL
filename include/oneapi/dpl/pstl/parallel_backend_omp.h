@@ -150,44 +150,44 @@ __process_chunk(const __chunk_policy& __policy, _Iterator __base, _Index __chunk
 // parallel_invoke
 //------------------------------------------------------------------------
 
-#include "./omp/parallel_invoke.h"
+#include "./patterns/omp/parallel_invoke.h"
 
 //------------------------------------------------------------------------
 // parallel_for
 //------------------------------------------------------------------------
 
-#include "./omp/parallel_for.h"
+#include "./patterns/omp/parallel_for.h"
 
 //------------------------------------------------------------------------
 // parallel_for_each
 //------------------------------------------------------------------------
 
-#include "./omp/parallel_for_each.h"
+#include "./patterns/omp/parallel_for_each.h"
 
 //------------------------------------------------------------------------
 // parallel_reduce
 //------------------------------------------------------------------------
 
-#include "./omp/parallel_reduce.h"
-#include "./omp/parallel_transform_reduce.h"
+#include "./patterns/omp/parallel_reduce.h"
+#include "./patterns/omp/parallel_transform_reduce.h"
 
 //------------------------------------------------------------------------
 // parallel_scan
 //------------------------------------------------------------------------
 
 #include "parallel_impl.h"
-#include "./omp/parallel_scan.h"
-#include "./omp/parallel_transform_scan.h"
+#include "./patterns/omp/parallel_scan.h"
+#include "./patterns/omp/parallel_transform_scan.h"
 
 //------------------------------------------------------------------------
 // parallel_stable_sort
 //------------------------------------------------------------------------
 
-#include "./omp/parallel_stable_sort.h"
+#include "./patterns/omp/parallel_stable_sort.h"
 
 //------------------------------------------------------------------------
 // parallel_merge
 //------------------------------------------------------------------------
-#include "./omp/parallel_merge.h"
+#include "./patterns/omp/parallel_merge.h"
 
 #endif //_ONEDPL_PARALLEL_BACKEND_OMP_H
