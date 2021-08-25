@@ -22,34 +22,14 @@
 #include <numeric>
 #include <utility>
 
+#include "parallel_backend_utils.h"
+
 namespace oneapi
 {
 namespace dpl
 {
-namespace __serial_backend
+namespace __par_backend
 {
-
-template <typename _ExecutionPolicy, typename _Tp>
-class __buffer
-{
-    ::std::allocator<_Tp> __allocator_;
-    _Tp* __ptr_;
-    const ::std::size_t __buf_size_;
-    __buffer(const __buffer&) = delete;
-    void
-    operator=(const __buffer&) = delete;
-
-  public:
-    __buffer(::std::size_t __n) : __allocator_(), __ptr_(__allocator_.allocate(__n)), __buf_size_(__n) {}
-
-    operator bool() const { return __ptr_ != nullptr; }
-    _Tp*
-    get() const
-    {
-        return __ptr_;
-    }
-    ~__buffer() { __allocator_.deallocate(__ptr_, __buf_size_); }
-};
 
 inline void
 __cancel_execution()

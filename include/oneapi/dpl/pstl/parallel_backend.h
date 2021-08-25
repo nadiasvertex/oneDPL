@@ -24,18 +24,9 @@
 #        include "hetero/dpcpp/parallel_backend_sycl_fpga.h"
 #    endif
 #endif
+
 #if defined(_ONEDPL_PAR_BACKEND_SERIAL)
 #    include "parallel_backend_serial.h"
-namespace oneapi
-{
-namespace dpl
-{
-namespace __par_backend
-{
-using namespace oneapi::dpl::__serial_backend;
-}
-} // namespace dpl
-} // namespace oneapi
 #elif defined(_ONEDPL_PAR_BACKEND_OMP)
 #    include "parallel_backend_omp.h"
 #elif defined(_ONEDPL_PAR_BACKEND_TBB)
