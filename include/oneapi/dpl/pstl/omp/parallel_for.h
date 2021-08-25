@@ -29,12 +29,6 @@ template <class _ExecutionPolicy, class _Index, class _Fp>
 void
 __parallel_for(_ExecutionPolicy&&, _Index __first, _Index __last, _Fp __f)
 {
-    if (__should_run_serial(__first, __last))
-    {
-        __f(__first, __last);
-        return;
-    }
-
     if (omp_in_parallel())
     {
         // we don't create a nested parallel region in an existing parallel
