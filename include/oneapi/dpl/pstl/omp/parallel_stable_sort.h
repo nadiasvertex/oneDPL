@@ -120,27 +120,13 @@ __parallel_stable_sort(_ExecutionPolicy&& __exec, _RandomAccessIterator __xs, _R
 
     if (omp_in_parallel())
     {
-        if (__count <= __nsort)
-        {
             __parallel_stable_sort_body(__xs, __xe, __comp, __leaf_sort);
-        }
-        else
-        {
-            __parallel_stable_partial_sort(__xs, __xe, __comp, __leaf_sort, __nsort);
-        }
     }
     else
     {
         _PSTL_PRAGMA(omp parallel)
         _PSTL_PRAGMA(omp single)
-        if (__count <= __nsort)
-        {
             __parallel_stable_sort_body(__xs, __xe, __comp, __leaf_sort);
-        }
-        else
-        {
-            __parallel_stable_partial_sort(__xs, __xe, __comp, __leaf_sort, __nsort);
-        }
     }
 }
 

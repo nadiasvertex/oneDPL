@@ -183,7 +183,6 @@ __process_chunk(const __chunk_policy& __policy, _Iterator __base, _Index __chunk
 // parallel_stable_sort
 //------------------------------------------------------------------------
 
-#include "./omp/parallel_stable_partial_sort.h"
 #include "./omp/parallel_stable_sort.h"
 
 //------------------------------------------------------------------------
